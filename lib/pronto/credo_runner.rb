@@ -43,14 +43,18 @@ module Pronto
 
     def new_message(offence, line)
       path = line.patch.delta.new_file[:path]
-      # update the Line to have the correct line number
-      # TODO it'd be great to have a real way to do this.
-      rugged_line = line.line.clone
-      rugged_line.instance_exec {
-        @new_lineno = offence[:line]
-      }
-      new_line = line.clone
-      new_line.line = rugged_line
+      if offence[:line].nil?
+        new_line = line
+      else
+        # update the Line to have the correct line number
+        # TODO it'd be great to have a real way to do this.
+        rugged_line = line.line.clone
+        rugged_line.instance_exec {
+          @new_lineno = offence[:line]
+        }
+        new_line = line.clone
+        new_line.line = rugged_line
+      end
       Message.new(path, new_line, offence[:level], offence[:message])
     end
 
